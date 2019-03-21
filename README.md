@@ -1,2 +1,2 @@
 # Voronoi
-Voronoi formula and example
+https://kodyjking.github.io/Voronoi/
