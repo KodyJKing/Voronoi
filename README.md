@@ -1,2 +1,2 @@
 # Voronoi
-https://kodyjking.github.io/Voronoi/
+Try here: https://kodyjking.github.io/Voronoi/
