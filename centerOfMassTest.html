@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+    </head>
+    <body style="margin: 0px; overflow: hidden">
+        <canvas id="myCanvas"></canvas>
+        <script src="voronoi.js"></script>
+        <script>
+            {
+                let canvas = document.getElementById("myCanvas")
+                let ctx = canvas.getContext("2d")
+                let points = []
+
+                let mouse = new Vector(0, 0)
+                let middle = new Vector(0, 0)
+
+                canvas.onmousedown = function(e) {
+                    points.push(mouse.subtract(middle))
+                }
+
+                canvas.onmousemove = function(e) {
+                    mouse.x = e.x
+                    mouse.y = e.y
+                }
+
+                function render() {
+                    const WIDTH = window.innerWidth
+                    const HEIGHT = window.innerHeight
+                    ctx.canvas.width = WIDTH
+                    ctx.canvas.height = HEIGHT
+
+                    middle = new Vector(WIDTH / 2, HEIGHT / 2)
+
+                    ctx.fillStyle = "#263236"
+                    ctx.fillRect(0, 0, WIDTH, HEIGHT)
+                    ctx.translate(middle.x, middle.y)
+
+                    if (points.length > 0) {
+                        ctx.strokeStyle = "white"           
+                        polygonPath(points)
+                        ctx.stroke()
+
+                        for (let point of points) {
+                            ctx.fillStyle = "white"
+                            circlePath(point, 3)
+                            ctx.fill()
+                        }
+
+                        ctx.fillStyle = "red"                        
+                        circlePath(centerOfMass(points), 3)     
+                        ctx.fill()                   
+                    }
+
+                    requestAnimationFrame(() => render())
+                }
+
+                function circlePath(a, radius) {
+                    ctx.beginPath()
+                    ctx.arc(a.x, a.y, radius, 0, 2 * Math.PI)
+                    ctx.closePath()
+                }
+
+                function polygonPath(polygon) {
+                    ctx.beginPath()
+                    ctx.moveTo(polygon[0].x, polygon[0].y)
+                    for (let i = 1; i < polygon.length; i++)
+                        ctx.lineTo(polygon[i].x, polygon[i].y)
+                    ctx.closePath()
+                }
+
+                render()
+            }
+        </script>
+    </body>
+</html>

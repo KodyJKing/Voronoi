@@ -49,8 +49,11 @@
 
 
                     // let boundary = []
-                    // let sides = 100
-                    // let radius = (Math.min(WIDTH, HEIGHT / Math.cos(Math.PI / sides)) / 2) - PADDING
+                    // let sides = 5
+                    // let angleIncrement = Math.PI * 2 / sides
+                    // let maxAngle = Math.round((Math.PI / 2) / angleIncrement) * angleIncrement
+                    // let maxHeight = Math.sin(maxAngle)
+                    // let radius = (Math.min(WIDTH, HEIGHT / maxHeight) / 2) - PADDING
                     // for (let i = 0; i < sides; i++) {
                     //     let angle = i * Math.PI * 2 / sides
                     //     boundary.push(
@@ -74,10 +77,10 @@
                     for (let i = 0; i < points.length; i++) {
                         let polygon = polygons[i]
 
-                        let points = polygon.sortedPoints
-                        if (points.length >= 3) {
+                        let vertices = polygon.sortedPoints
+                        if (vertices.length >= 3) {
                             ctx.save()
-                                polygonPath(points)
+                                polygonPath(vertices)
 
                                 ctx.fillStyle = colors[i]
                                 ctx.fill()
@@ -90,31 +93,39 @@
                                     ctx.stroke()
                                 ctx.restore()
 
-                                ctx.globalAlpha = 1
                                 ctx.lineWidth = 2
                                 ctx.stroke()
 
-                                ctx.fillStyle = "white"
-                                circlePath(polygon.point, 3)
-                                ctx.fill()
+                                ctx.save()
+                                    let radius = Math.sqrt(area(vertices) / Math.PI) / 5
+                                    ctx.fillStyle = "white"
+                                    circlePath(polygon.point, radius)
+                                    ctx.fill()
+                                    ctx.strokeStyle = colors[i]
+                                    ctx.globalAlpha = 0.7
+                                    ctx.lineWidth = 10
+                                    ctx.stroke()
+                                ctx.restore()
+
                             ctx.restore()
                         }
 
 
                         let point = polygon.point
 
-                        let average = points.reduce((a, b) => a.add(b), new Vector(0, 0)).multiply(1 / points.length)
-                        let lerped = polygon.point.lerp(average, 0.01)
-                        if (Number.isFinite(lerped.x) && Number.isFinite(lerped.y))
-                            velocities[i] = velocities[i].add(lerped.subtract(point))
+                        // let average = vertices.reduce((a, b) => a.add(b), new Vector(0, 0)).multiply(1 / vertices.length)
+                        // let target = polygon.point.lerp(average, 0.01)
+                        let centroid = centerOfMass(vertices)
+                        let target = polygon.point.lerp(centroid, 0.01)
+                        if (Number.isFinite(target.x) && Number.isFinite(target.y))
+                            velocities[i] = velocities[i].add(target.subtract(point))
 
                         let acceleration = Vector.polar(i + performance.now() / 1000, 0.1)
                         velocities[i] = velocities[i].add(acceleration)
 
-                        point.x += velocities[i].x
-                        point.y += velocities[i].y
-                        velocities[i].x *= 0.9
-                        velocities[i].y *= 0.9
+                        points[i] = points[i].add(velocities[i])
+                        velocities[i].x *= 0.95
+                        velocities[i].y *= 0.95
                     }
 
 
