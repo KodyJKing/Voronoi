@@ -138,7 +138,7 @@ function area(vertices) {
 // Similar logic is used for x.
 function centerOfMass(vertices) {
     // cy * area = ∫∫ y dA = ∫ y x(y) dy = ∫ y (x0 + m (y - y0)) dy
-    // = ∫ x0 y - m y0 y + y^2 dy = ∫ (x0 - m y0) y + y^2 dy
+    // = ∫ x0 y - m y0 y + m y^2 dy = ∫ (x0 - m y0) y + m y^2 dy
     // = 1/2 y^2 (x0 - m y0) + 1/3 m y^3
     let integral = (y, m, x0, y0) => (m * (y ** 3) / 3) + ((x0 - m * y0) * (y ** 2) / 2)
 
